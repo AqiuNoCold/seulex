@@ -3,6 +3,7 @@
 #include <stack>
 #include <unordered_map>
 #include <fstream>
+#include <iterator>
 
 #include "global.h"
 
@@ -293,20 +294,70 @@ string escapeCharForCase(char c) {
 
 
 void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& filename) {
-    ofstream out(filename, ios::app); // 追加模式写入
+    const string prologBegin = "/* __SEULEX_PROLOG_BEGIN__ */";
+    const string prologEnd   = "/* __SEULEX_PROLOG_END__ */";
+    const string yylexBegin  = "/* __SEULEX_YYLEX_BEGIN__ */";
+    const string yylexEnd    = "/* __SEULEX_YYLEX_END__ */";
+
+    string originalContent;
+    {
+        ifstream existing(filename);
+        if (existing.is_open()) {
+            originalContent.assign((istreambuf_iterator<char>(existing)),
+                                   istreambuf_iterator<char>());
+        }
+    }
+
+    auto stripSection = [&](const string& beginMarker, const string& endMarker) {
+        size_t begin = originalContent.find(beginMarker);
+        if (begin != string::npos) {
+            size_t end = originalContent.find(endMarker, begin + beginMarker.size());
+            if (end != string::npos) {
+                originalContent.erase(begin, end - begin + endMarker.size());
+            }
+        }
+    };
+
+    stripSection(prologBegin, prologEnd);
+    stripSection(yylexBegin, yylexEnd);
+
+    ofstream out(filename);
     if (!out.is_open()) {
         cerr << "无法打开文件 " << filename << " 进行写入！" << endl;
         return;
     }
+
+    out << prologBegin << "\n";
+    out << "#include <stdio.h>\n";
+    out << "#include <string.h>\n\n";
+    out << "int yylineno = 1;\n";
+    out << "FILE *yyin = NULL;\n";
+    out << "FILE *yyout = NULL;\n\n";
     out << "char yytext[1024] = \"\";\n";
-    out << "int yyleng = 0;\n";
-    out << "\n\nint yylex() {\n";
+    out << "int yyleng = 0;\n\n";
+    out << "static int input(void) {\n";
+    out << "    int c = fgetc(yyin ? yyin : stdin);\n";
+    out << "    if (c == '\\n') yylineno++;\n";
+    out << "    return (c == EOF) ? 0 : c;\n";
+    out << "}\n\n";
+    out << "#define ECHO fwrite(yytext, yyleng, 1, yyout ? yyout : stdout)\n";
+    out << prologEnd << "\n\n";
+
+    if (!originalContent.empty()) {
+        out << originalContent;
+        if (originalContent.back() != '\n') {
+            out << "\n";
+        }
+        out << "\n";
+    }
+    
+    out << "int yylex() {\n";
     out << "    yyleng = 0;\n";
     out << "    memset(yytext, 0, sizeof(yytext));\n";
     out << "    int state = " << dfaStates[0]->id << ";\n";
     out << "    int ch;\n";
     // out << "    printf(\"-------------------------新一轮输入-------------------------\\n\");\n";
-    out << "    while ((ch = getchar())) {\n";
+    out << "    while ((ch = input())) {\n";
     out << "        switch(state) {\n";
 
     for (auto* state : dfaStates) {
@@ -372,4 +423,3 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
     out.close();
     cout << "已将 C 风格 yylex() 函数追加写入 " << filename << endl;
 }
-

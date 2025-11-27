@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     vector<DFAState*> minState = minimizeDFA(dfaStates);
     cout << "完成最小化DFA" << endl;
     // 输出DFA图和词法分析器
-    generateDFAtoDOT(minState, "dfa.dot");
+    // generateDFAtoDOT(minState, "dfa.dot");
     generateYylexFromDFA(minState, "lex.yy.c");
 
     cout << "已成功处理文件: " << inputFile << endl;

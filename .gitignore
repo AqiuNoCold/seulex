@@ -1,5 +1,6 @@
 *.dot
 *.png
 *.exe
+*.o
 report/
 .vscode/
