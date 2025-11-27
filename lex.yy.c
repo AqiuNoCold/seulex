@@ -1,3 +1,23 @@
+/* __SEULEX_PROLOG_BEGIN__ */
+#include <stdio.h>
+#include <string.h>
+
+int yylineno = 1;
+FILE *yyin = NULL;
+FILE *yyout = NULL;
+
+char yytext[1024] = "";
+int yyleng = 0;
+
+static int input(void) {
+    int c = fgetc(yyin ? yyin : stdin);
+    if (c == '\n') yylineno++;
+    return (c == EOF) ? 0 : c;
+}
+
+#define ECHO fwrite(yytext, yyleng, 1, yyout ? yyout : stdout)
+/* __SEULEX_PROLOG_END__ */
+
 
 #include <stdio.h>
 #include "y.tab.h"
@@ -17,6 +37,7 @@ void comment(void)
   
 	while ((c = input()) != 0)      /* (EOF maps to 0) */
 	{
+        printf("%c", c);
 		if (c == '/' && prev == '*')
 			return;
 		prev = c;
@@ -59,39 +80,37 @@ int check_type(void)
 */
 
 	return IDENTIFIER;
-}char yytext[1024] = "";
-int yyleng = 0;
-
+}
 
 int yylex() {
     yyleng = 0;
     memset(yytext, 0, sizeof(yytext));
     int state = 0;
     int ch;
-    while ((ch = getchar())) {
+    while ((ch = input())) {
         switch(state) {
             case 0:
                 switch(ch) {
                     case EOF:
                         return YYEOF;
                     case '\t':
-                        state = 208;
+                        state = 209;
                         break;
                     case '\n':
-                        state = 208;
+                        state = 209;
                         break;
                     case '\x0B':
-                        state = 208;
+                        state = 209;
                         yytext[yyleng++] = ch;
                         break;
                     case '\f':
-                        state = 208;
+                        state = 209;
                         break;
                     case ' ':
-                        state = 208;
+                        state = 209;
                         break;
                     case '!':
-                        state = 193;
+                        state = 194;
                         yytext[yyleng++] = ch;
                         break;
                     case '"':
@@ -99,11 +118,11 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '#':
-                        state = 206;
+                        state = 207;
                         yytext[yyleng++] = ch;
                         break;
                     case '$':
-                        state = 206;
+                        state = 207;
                         yytext[yyleng++] = ch;
                         break;
                     case '%':
@@ -119,15 +138,15 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '(':
-                        state = 209;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ')':
                         state = 210;
                         yytext[yyleng++] = ch;
                         break;
+                    case ')':
+                        state = 211;
+                        yytext[yyleng++] = ch;
+                        break;
                     case '*':
-                        state = 194;
+                        state = 195;
                         yytext[yyleng++] = ch;
                         break;
                     case '+':
@@ -135,7 +154,7 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case ',':
-                        state = 211;
+                        state = 212;
                         yytext[yyleng++] = ch;
                         break;
                     case '-':
@@ -191,11 +210,11 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case ':':
-                        state = 199;
+                        state = 200;
                         yytext[yyleng++] = ch;
                         break;
                     case ';':
-                        state = 212;
+                        state = 213;
                         yytext[yyleng++] = ch;
                         break;
                     case '<':
@@ -203,7 +222,7 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 197;
+                        state = 196;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
@@ -211,11 +230,11 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '?':
-                        state = 213;
+                        state = 214;
                         yytext[yyleng++] = ch;
                         break;
                     case '@':
-                        state = 206;
+                        state = 207;
                         yytext[yyleng++] = ch;
                         break;
                     case 'A':
@@ -323,19 +342,19 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '[':
-                        state = 214;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\\':
-                        state = 206;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ']':
                         state = 215;
                         yytext[yyleng++] = ch;
                         break;
+                    case '\\':
+                        state = 207;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ']':
+                        state = 216;
+                        yytext[yyleng++] = ch;
+                        break;
                     case '^':
-                        state = 195;
+                        state = 197;
                         yytext[yyleng++] = ch;
                         break;
                     case '_':
@@ -343,7 +362,7 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '`':
-                        state = 206;
+                        state = 207;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
@@ -451,19 +470,19 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '{':
-                        state = 216;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '|':
-                        state = 234;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '}':
                         state = 217;
                         yytext[yyleng++] = ch;
                         break;
-                    case '~':
+                    case '|':
+                        state = 193;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '}':
                         state = 218;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '~':
+                        state = 219;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -861,383 +880,383 @@ int yylex() {
             case 2:
                 switch(ch) {
                     case ' ':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '!':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '"':
-                        state = 237;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '#':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '$':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '%':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '&':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\'':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '(':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ')':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '*':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '+':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ',':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '-':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '.':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '/':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '0':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '1':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '2':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '3':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '4':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '5':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '6':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '7':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '8':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '9':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ':':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ';':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '<':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '=':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '>':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '?':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '@':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'A':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'B':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'C':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'D':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'E':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'F':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'G':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'H':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'I':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'J':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'K':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'L':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'M':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'N':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'O':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'P':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Q':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'R':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'S':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'T':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'U':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'V':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'W':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'X':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Y':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Z':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '[':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\\':
                         state = 242;
                         yytext[yyleng++] = ch;
                         break;
+                    case '!':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '"':
+                        state = 239;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '#':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '$':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '%':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '&':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\'':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '(':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ')':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '*':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '+':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ',':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '-':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '.':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '/':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '0':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '1':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '2':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '3':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '4':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '5':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '6':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '7':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '8':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '9':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ':':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ';':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '<':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '=':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '>':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '?':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '@':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'A':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'B':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'C':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'D':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'E':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'F':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'G':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'H':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'I':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'J':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'K':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'L':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'M':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'N':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'O':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'P':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Q':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'R':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'S':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'T':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'U':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'V':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'W':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'X':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Y':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Z':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '[':
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\\':
+                        state = 244;
+                        yytext[yyleng++] = ch;
+                        break;
                     case ']':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '^':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '_':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '`':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'b':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'c':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'd':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'g':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'h':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'i':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'j':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'k':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'm':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'n':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'o':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'q':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'r':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 's':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 't':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'v':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'w':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'x':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'y':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'z':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '{':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '|':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '}':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '~':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -1249,379 +1268,379 @@ int yylex() {
             case 3:
                 switch(ch) {
                     case ' ':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '!':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '"':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '#':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '$':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '%':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '&':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '(':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ')':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '*':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '+':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ',':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '-':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '.':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '/':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '0':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '1':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '2':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '3':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '4':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '5':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '6':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '7':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '8':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '9':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ':':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ';':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '<':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '=':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '>':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '?':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '@':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'A':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'B':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'C':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'D':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'E':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'F':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'G':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'H':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'I':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'J':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'K':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'L':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'M':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'N':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'O':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'P':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Q':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'R':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'S':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'T':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'U':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'V':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'W':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'X':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Y':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Z':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '[':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\\':
                         state = 243;
                         yytext[yyleng++] = ch;
                         break;
+                    case '!':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '"':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '#':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '$':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '%':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '&':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '(':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ')':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '*':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '+':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ',':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '-':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '.':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '/':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '0':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '1':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '2':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '3':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '4':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '5':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '6':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '7':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '8':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '9':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ':':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ';':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '<':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '=':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '>':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '?':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '@':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'A':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'B':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'C':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'D':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'E':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'F':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'G':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'H':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'I':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'J':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'K':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'L':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'M':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'N':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'O':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'P':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Q':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'R':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'S':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'T':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'U':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'V':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'W':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'X':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Y':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Z':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '[':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\\':
+                        state = 245;
+                        yytext[yyleng++] = ch;
+                        break;
                     case ']':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '^':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '_':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '`':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'b':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'c':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'd':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'g':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'h':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'i':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'j':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'k':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'm':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'n':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'o':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'q':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'r':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 's':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 't':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'v':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'w':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'x':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'y':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'z':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '{':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '|':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '}':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '~':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -1633,11 +1652,11 @@ int yylex() {
             case 4:
                 switch(ch) {
                     case '"':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '\'':
-                        state = 244;
+                        state = 246;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
@@ -1901,19 +1920,19 @@ int yylex() {
             case 5:
                 switch(ch) {
                     case '%':
-                        state = 216;
+                        state = 217;
                         yytext[yyleng++] = ch;
                         break;
                     case ':':
-                        state = 214;
+                        state = 215;
                         yytext[yyleng++] = ch;
                         break;
                     case '<':
-                        state = 196;
+                        state = 198;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 230;
+                        state = 231;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -1925,11 +1944,11 @@ int yylex() {
             case 6:
                 switch(ch) {
                     case '&':
-                        state = 221;
+                        state = 222;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 220;
+                        state = 221;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -1941,7 +1960,7 @@ int yylex() {
             case 7:
                 switch(ch) {
                     case '*':
-                        state = 207;
+                        state = 208;
                         yytext[yyleng++] = ch;
                         break;
                     case '/':
@@ -1949,7 +1968,7 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 224;
+                        state = 225;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -1961,11 +1980,11 @@ int yylex() {
             case 8:
                 switch(ch) {
                     case '+':
-                        state = 228;
+                        state = 229;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 219;
+                        state = 220;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -1977,15 +1996,15 @@ int yylex() {
             case 9:
                 switch(ch) {
                     case '-':
-                        state = 223;
+                        state = 224;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 238;
+                        state = 240;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
-                        state = 235;
+                        state = 237;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -2065,15 +2084,15 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 200;
+                        state = 201;
                         yytext[yyleng++] = ch;
                         break;
                     case 'P':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
@@ -2101,15 +2120,15 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 203;
+                        state = 204;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -2165,27 +2184,27 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 200;
+                        state = 201;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 203;
+                        state = 204;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -2233,43 +2252,43 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 246;
+                        state = 248;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 246;
+                        state = 248;
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 200;
+                        state = 201;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     case 'X':
-                        state = 248;
+                        state = 250;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 203;
+                        state = 204;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     case 'x':
-                        state = 248;
+                        state = 250;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -2317,35 +2336,35 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 246;
+                        state = 248;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 246;
+                        state = 248;
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 200;
+                        state = 201;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 203;
+                        state = 204;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 201;
+                        state = 202;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -2357,7 +2376,7 @@ int yylex() {
             case 14:
                 switch(ch) {
                     case '.':
-                        state = 247;
+                        state = 249;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
@@ -47453,11 +47472,11 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'P':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
@@ -47485,11 +47504,11 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47541,27 +47560,27 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'F':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 245;
+                        state = 247;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47613,19 +47632,19 @@ int yylex() {
                         yytext[yyleng++] = ch;
                         break;
                     case 'F':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47637,11 +47656,11 @@ int yylex() {
             case 191:
                 switch(ch) {
                     case '=':
-                        state = 231;
+                        state = 232;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
-                        state = 217;
+                        state = 218;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47653,11 +47672,11 @@ int yylex() {
             case 192:
                 switch(ch) {
                     case '=':
-                        state = 227;
+                        state = 228;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
-                        state = 198;
+                        state = 199;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47669,7 +47688,23 @@ int yylex() {
             case 193:
                 switch(ch) {
                     case '=':
-                        state = 233;
+                        state = 235;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '|':
+                        state = 236;
+                        yytext[yyleng++] = ch;
+                        break;
+                    default:
+                        ungetc(ch, stdin);
+                        count(); return('|'); 
+                        state = 0; break;
+                }
+                break;
+            case 194:
+                switch(ch) {
+                    case '=':
+                        state = 234;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47678,10 +47713,10 @@ int yylex() {
                         state = 0; break;
                 }
                 break;
-            case 194:
+            case 195:
                 switch(ch) {
                     case '=':
-                        state = 232;
+                        state = 233;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47690,10 +47725,22 @@ int yylex() {
                         state = 0; break;
                 }
                 break;
-            case 195:
+            case 196:
                 switch(ch) {
                     case '=':
-                        state = 239;
+                        state = 227;
+                        yytext[yyleng++] = ch;
+                        break;
+                    default:
+                        ungetc(ch, stdin);
+                        count(); return('='); 
+                        state = 0; break;
+                }
+                break;
+            case 197:
+                switch(ch) {
+                    case '=':
+                        state = 241;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47702,10 +47749,10 @@ int yylex() {
                         state = 0; break;
                 }
                 break;
-            case 196:
+            case 198:
                 switch(ch) {
                     case '=':
-                        state = 229;
+                        state = 230;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47714,22 +47761,10 @@ int yylex() {
                         state = 0; break;
                 }
                 break;
-            case 197:
+            case 199:
                 switch(ch) {
                     case '=':
-                        state = 226;
-                        yytext[yyleng++] = ch;
-                        break;
-                    default:
-                        ungetc(ch, stdin);
-                        count(); return(OR_ASSIGN); 
-                        state = 0; break;
-                }
-                break;
-            case 198:
-                switch(ch) {
-                    case '=':
-                        state = 236;
+                        state = 238;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47738,10 +47773,10 @@ int yylex() {
                         state = 0; break;
                 }
                 break;
-            case 199:
+            case 200:
                 switch(ch) {
                     case '>':
-                        state = 215;
+                        state = 216;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47750,34 +47785,18 @@ int yylex() {
                         state = 0; break;
                 }
                 break;
-            case 200:
-                switch(ch) {
-                    case 'L':
-                        state = 204;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'U':
-                        state = 222;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'u':
-                        state = 222;
-                        yytext[yyleng++] = ch;
-                        break;
-                    default:
-                        ungetc(ch, stdin);
-                        count(); return(CONSTANT); 
-                        state = 0; break;
-                }
-                break;
             case 201:
                 switch(ch) {
                     case 'L':
-                        state = 202;
+                        state = 205;
                         yytext[yyleng++] = ch;
                         break;
-                    case 'l':
-                        state = 205;
+                    case 'U':
+                        state = 223;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'u':
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47789,7 +47808,11 @@ int yylex() {
             case 202:
                 switch(ch) {
                     case 'L':
-                        state = 222;
+                        state = 203;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'l':
+                        state = 206;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47800,16 +47823,8 @@ int yylex() {
                 break;
             case 203:
                 switch(ch) {
-                    case 'U':
-                        state = 222;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'l':
-                        state = 204;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'u':
-                        state = 222;
+                    case 'L':
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47821,11 +47836,15 @@ int yylex() {
             case 204:
                 switch(ch) {
                     case 'U':
-                        state = 222;
+                        state = 223;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'l':
+                        state = 205;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 222;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47836,8 +47855,12 @@ int yylex() {
                 break;
             case 205:
                 switch(ch) {
-                    case 'l':
-                        state = 222;
+                    case 'U':
+                        state = 223;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'u':
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -47847,1329 +47870,572 @@ int yylex() {
                 }
                 break;
             case 206:
+                switch(ch) {
+                    case 'l':
+                        state = 223;
+                        yytext[yyleng++] = ch;
+                        break;
+                    default:
+                        ungetc(ch, stdin);
+                        count(); return(CONSTANT); 
+                        state = 0; break;
+                }
+                break;
+            case 207:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 /* Add code to complain about unmatched characters */ 
                 state = 0; break;
-            case 207:
+            case 208:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 comment(); 
                 state = 0; break;
-            case 208:
+            case 209:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); 
                 state = 0; break;
-            case 209:
+            case 210:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return('('); 
                 state = 0; break;
-            case 210:
+            case 211:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(')'); 
                 state = 0; break;
-            case 211:
+            case 212:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(','); 
                 state = 0; break;
-            case 212:
+            case 213:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(';'); 
                 state = 0; break;
-            case 213:
+            case 214:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return('?'); 
                 state = 0; break;
-            case 214:
+            case 215:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return('['); 
                 state = 0; break;
-            case 215:
+            case 216:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(']'); 
                 state = 0; break;
-            case 216:
+            case 217:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return('{'); 
                 state = 0; break;
-            case 217:
+            case 218:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return('}'); 
                 state = 0; break;
-            case 218:
+            case 219:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return('~'); 
                 state = 0; break;
-            case 219:
+            case 220:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(ADD_ASSIGN); 
                 state = 0; break;
-            case 220:
+            case 221:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(AND_ASSIGN); 
                 state = 0; break;
-            case 221:
+            case 222:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(AND_OP); 
                 state = 0; break;
-            case 222:
+            case 223:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(CONSTANT); 
                 state = 0; break;
-            case 223:
+            case 224:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(DEC_OP); 
                 state = 0; break;
-            case 224:
+            case 225:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(DIV_ASSIGN); 
                 state = 0; break;
-            case 225:
+            case 226:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(ELLIPSIS); 
                 state = 0; break;
-            case 226:
+            case 227:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(EQ_OP); 
                 state = 0; break;
-            case 227:
+            case 228:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(GE_OP); 
                 state = 0; break;
-            case 228:
+            case 229:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(INC_OP); 
                 state = 0; break;
-            case 229:
+            case 230:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(LEFT_ASSIGN); 
                 state = 0; break;
-            case 230:
+            case 231:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(LE_OP); 
                 state = 0; break;
-            case 231:
+            case 232:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(MOD_ASSIGN); 
                 state = 0; break;
-            case 232:
+            case 233:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(MUL_ASSIGN); 
                 state = 0; break;
-            case 233:
+            case 234:
                 ungetc(ch, stdin);
                 // 匹配接受状态
                 count(); return(NE_OP); 
                 state = 0; break;
-            case 234:
-                ungetc(ch, stdin);
-                // 匹配接受状态
-                count(); return(OR_OP); 
-                state = 0; break;
             case 235:
                 ungetc(ch, stdin);
                 // 匹配接受状态
-                count(); return(PTR_OP); 
+                count(); return(OR_ASSIGN); 
                 state = 0; break;
             case 236:
                 ungetc(ch, stdin);
                 // 匹配接受状态
-                count(); return(RIGHT_ASSIGN); 
+                count(); return(OR_OP); 
                 state = 0; break;
             case 237:
                 ungetc(ch, stdin);
                 // 匹配接受状态
-                count(); return(STRING_LITERAL); 
+                count(); return(PTR_OP); 
                 state = 0; break;
             case 238:
                 ungetc(ch, stdin);
                 // 匹配接受状态
-                count(); return(SUB_ASSIGN); 
+                count(); return(RIGHT_ASSIGN); 
                 state = 0; break;
             case 239:
                 ungetc(ch, stdin);
                 // 匹配接受状态
-                count(); return(XOR_ASSIGN); 
+                count(); return(STRING_LITERAL); 
                 state = 0; break;
             case 240:
-                switch(ch) {
-                    case ' ':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '!':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '"':
-                        state = 237;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '#':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '$':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '%':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '&':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\'':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '(':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ')':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '*':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '+':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ',':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '-':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '.':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '/':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '0':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '1':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '2':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '3':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '4':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '5':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '6':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '7':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '8':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '9':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ':':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ';':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '<':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '=':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '>':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '?':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '@':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'A':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'B':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'C':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'D':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'E':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'F':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'G':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'H':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'I':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'J':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'K':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'L':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'M':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'N':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'O':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'P':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Q':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'R':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'S':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'T':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'U':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'V':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'W':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'X':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Y':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Z':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '[':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\\':
-                        state = 242;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ']':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '^':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '_':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '`':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'a':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'b':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'c':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'd':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'e':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'f':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'g':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'h':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'i':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'j':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'k':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'l':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'm':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'n':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'o':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'p':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'q':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'r':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 's':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 't':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'u':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'v':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'w':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'x':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'y':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'z':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '{':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '|':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '}':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '~':
-                        state = 240;
-                        yytext[yyleng++] = ch;
-                        break;
-                    default:
-                        ungetc(ch, stdin);
-                        return -1;
-                }
-                break;
+                ungetc(ch, stdin);
+                // 匹配接受状态
+                count(); return(SUB_ASSIGN); 
+                state = 0; break;
             case 241:
-                switch(ch) {
-                    case ' ':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '!':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '"':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '#':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '$':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '%':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '&':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\'':
-                        state = 222;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '(':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ')':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '*':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '+':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ',':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '-':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '.':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '/':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '0':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '1':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '2':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '3':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '4':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '5':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '6':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '7':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '8':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '9':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ':':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ';':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '<':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '=':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '>':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '?':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '@':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'A':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'B':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'C':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'D':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'E':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'F':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'G':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'H':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'I':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'J':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'K':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'L':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'M':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'N':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'O':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'P':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Q':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'R':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'S':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'T':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'U':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'V':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'W':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'X':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Y':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'Z':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '[':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '\\':
-                        state = 243;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case ']':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '^':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '_':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '`':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'a':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'b':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'c':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'd':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'e':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'f':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'g':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'h':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'i':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'j':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'k':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'l':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'm':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'n':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'o':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'p':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'q':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'r':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 's':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 't':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'u':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'v':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'w':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'x':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'y':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case 'z':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '{':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '|':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '}':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    case '~':
-                        state = 241;
-                        yytext[yyleng++] = ch;
-                        break;
-                    default:
-                        ungetc(ch, stdin);
-                        return -1;
-                }
-                break;
+                ungetc(ch, stdin);
+                // 匹配接受状态
+                count(); return(XOR_ASSIGN); 
+                state = 0; break;
             case 242:
                 switch(ch) {
                     case ' ':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '!':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '"':
-                        state = 240;
+                        state = 239;
                         yytext[yyleng++] = ch;
                         break;
                     case '#':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '$':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '%':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '&':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '\'':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '(':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ')':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '*':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '+':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ',':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '-':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '.':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '/':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '1':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '2':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '3':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '4':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '5':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '6':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '7':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ':':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ';':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '<':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '?':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '@':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'A':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'B':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'C':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'D':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'F':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'G':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'H':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'I':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'J':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'K':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'M':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'N':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'O':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'P':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Q':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'R':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'S':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'T':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'V':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'W':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'X':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Y':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Z':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '[':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '\\':
-                        state = 240;
+                        state = 244;
                         yytext[yyleng++] = ch;
                         break;
                     case ']':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '^':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '_':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '`':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'b':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'c':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'd':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'g':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'h':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'i':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'j':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'k':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'm':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'n':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'o':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'q':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'r':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 's':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 't':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'v':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'w':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'x':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'y':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'z':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '{':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '|':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '}':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '~':
-                        state = 240;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -49180,383 +48446,383 @@ int yylex() {
             case 243:
                 switch(ch) {
                     case ' ':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '!':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '"':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '#':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '$':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '%':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '&':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '\'':
-                        state = 241;
+                        state = 223;
                         yytext[yyleng++] = ch;
                         break;
                     case '(':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case ')':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '*':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '+':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case ',':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '-':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '.':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '/':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '1':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '2':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '3':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '4':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '5':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '6':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '7':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case ':':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case ';':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '<':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '?':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '@':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'A':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'B':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'C':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'D':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'F':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'G':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'H':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'I':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'J':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'K':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'M':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'N':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'O':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'P':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Q':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'R':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'S':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'T':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'V':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'W':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'X':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Y':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Z':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '[':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '\\':
-                        state = 241;
+                        state = 245;
                         yytext[yyleng++] = ch;
                         break;
                     case ']':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '^':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '_':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '`':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'b':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'c':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'd':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'g':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'h':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'i':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'j':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'k':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'm':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'n':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'o':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'q':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'r':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 's':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 't':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'v':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'w':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'x':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'y':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'z':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '{':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '|':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '}':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '~':
-                        state = 241;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -49567,379 +48833,383 @@ int yylex() {
             case 244:
                 switch(ch) {
                     case ' ':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '!':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '"':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '#':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '$':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '%':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '&':
-                        state = 241;
+                        state = 242;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\'':
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '(':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ')':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '*':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '+':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ',':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '-':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '.':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '/':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '1':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '2':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '3':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '4':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '5':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '6':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '7':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ':':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ';':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '<':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '=':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '>':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '?':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '@':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'A':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'B':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'C':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'D':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'F':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'G':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'H':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'I':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'J':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'K':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'L':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'M':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'N':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'O':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'P':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Q':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'R':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'S':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'T':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'U':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'V':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'W':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'X':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Y':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'Z':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '[':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '\\':
-                        state = 243;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case ']':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '^':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '_':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '`':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'a':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'b':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'c':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'd':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'e':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'f':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'g':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'h':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'i':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'j':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'k':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'l':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'm':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'n':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'o':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'p':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'q':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'r':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 's':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 't':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'u':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'v':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'w':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'x':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'y':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case 'z':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '{':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '|':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '}':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     case '~':
-                        state = 241;
+                        state = 242;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -49949,52 +49219,384 @@ int yylex() {
                 break;
             case 245:
                 switch(ch) {
+                    case ' ':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '!':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '"':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '#':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '$':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '%':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '&':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\'':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '(':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ')':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '*':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
                     case '+':
-                        state = 250;
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ',':
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '-':
-                        state = 250;
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '.':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '/':
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '1':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '2':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '3':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '4':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '5':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '6':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '7':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 190;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 190;
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ':':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ';':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '<':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '=':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '>':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '?':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '@':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'A':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'B':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'C':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'D':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'E':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'F':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'G':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'H':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'I':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'J':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'K':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'L':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'M':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'N':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'O':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'P':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Q':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'R':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'S':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'T':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'U':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'V':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'W':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'X':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Y':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Z':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '[':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\\':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ']':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '^':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '_':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '`':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'a':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'b':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'c':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'd':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'e':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'f':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'g':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'h':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'i':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'j':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'k':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'l':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'm':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'n':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'o':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'p':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'q':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'r':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 's':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 't':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'u':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'v':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'w':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'x':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'y':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'z':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '{':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '|':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '}':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '~':
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -50004,56 +49606,380 @@ int yylex() {
                 break;
             case 246:
                 switch(ch) {
+                    case ' ':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '!':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '"':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '#':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '$':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '%':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '&':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '(':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ')':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '*':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '+':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ',':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '-':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
                     case '.':
-                        state = 189;
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '/':
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '1':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '2':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '3':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '4':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '5':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '6':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '7':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '8':
-                        state = 246;
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case '9':
-                        state = 246;
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ':':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case ';':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '<':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '=':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '>':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '?':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '@':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'A':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'B':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'C':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'D':
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     case 'E':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'F':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'G':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'H':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'I':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'J':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'K':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'L':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'M':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'N':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'O':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'P':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Q':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'R':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'S':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'T':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'U':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'V':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'W':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'X':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Y':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'Z':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '[':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '\\':
                         state = 245;
                         yytext[yyleng++] = ch;
                         break;
+                    case ']':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '^':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '_':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '`':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'a':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'b':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'c':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'd':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
                     case 'e':
-                        state = 245;
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'f':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'g':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'h':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'i':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'j':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'k':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'l':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'm':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'n':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'o':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'p':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'q':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'r':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 's':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 't':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'u':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'v':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'w':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'x':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'y':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'z':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '{':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '|':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '}':
+                        state = 243;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '~':
+                        state = 243;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -50063,8 +49989,52 @@ int yylex() {
                 break;
             case 247:
                 switch(ch) {
-                    case '.':
-                        state = 225;
+                    case '+':
+                        state = 252;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '-':
+                        state = 252;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '0':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '1':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '2':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '3':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '4':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '5':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '6':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '7':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '8':
+                        state = 190;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '9':
+                        state = 190;
                         yytext[yyleng++] = ch;
                         break;
                     default:
@@ -50075,7 +50045,77 @@ int yylex() {
             case 248:
                 switch(ch) {
                     case '.':
-                        state = 249;
+                        state = 189;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '0':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '1':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '2':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '3':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '4':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '5':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '6':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '7':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '8':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case '9':
+                        state = 248;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'E':
+                        state = 247;
+                        yytext[yyleng++] = ch;
+                        break;
+                    case 'e':
+                        state = 247;
+                        yytext[yyleng++] = ch;
+                        break;
+                    default:
+                        ungetc(ch, stdin);
+                        return -1;
+                }
+                break;
+            case 249:
+                switch(ch) {
+                    case '.':
+                        state = 226;
+                        yytext[yyleng++] = ch;
+                        break;
+                    default:
+                        ungetc(ch, stdin);
+                        return -1;
+                }
+                break;
+            case 250:
+                switch(ch) {
+                    case '.':
+                        state = 251;
                         yytext[yyleng++] = ch;
                         break;
                     case '0':
@@ -50171,7 +50211,7 @@ int yylex() {
                         return -1;
                 }
                 break;
-            case 249:
+            case 251:
                 switch(ch) {
                     case '0':
                         state = 188;
@@ -50266,7 +50306,7 @@ int yylex() {
                         return -1;
                 }
                 break;
-            case 250:
+            case 252:
                 switch(ch) {
                     case '0':
                         state = 190;

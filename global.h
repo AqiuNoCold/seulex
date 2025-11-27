@@ -12,6 +12,7 @@
 #define EPSLONG -1
 #define CONNECT '\x1D'
 #define EPSILON '\x1B'
+#define ESCAPE_PLACEHOLDER '\x1C'
 using namespace std;
 
 struct State {

@@ -227,35 +227,58 @@ string handleQuestionAndPlus(const string& regex) {
 
 
 string addConcatenation(const string& regex) {
-    string result;
-    bool inEscape = false; 
-    for (size_t i = 0; i < regex.size(); ++i) {
-        char curr = regex[i];
+    if (regex.empty()) return "";
+    
+    // 第一步：将转义序列替换为临时占位符
+    string processed;
+    vector<string> escapeSequences;  // 存储转义序列
+    bool inEscape = false;
+    string currentEscape;
+    
+    for (char c : regex) {
         if (inEscape) {
-            result += curr;
+            currentEscape += c;
+            escapeSequences.push_back("\\" + string(1, c));  // 记录原始转义序列
+            processed += ESCAPE_PLACEHOLDER;  // 使用特殊占位符，如 '\x01'
             inEscape = false;
-            continue;
-        }
-        if (curr == '\\') {
-            char prev = regex[i - 1];
-            if(i != 0 && prev != '(' && prev != '|')
-            {
-                result += CONNECT;
-            }
+        } else if (c == '\\') {
             inEscape = true;
-            result += curr;
-            continue;
+            currentEscape = "\\";
+        } else {
+            processed += c;
         }
-        char prev = regex[i - 1];
-        bool isCurrOrdinary = !isMetaChar(curr);
-        bool isCurrStartGroup = (curr == '[' || curr == '(');
-        bool isPrevValid = (i != 0 && prev != '(' && prev != '|');
-        if ((isCurrOrdinary && isPrevValid) ||
-            (isCurrStartGroup && isPrevValid)) {
-            result += CONNECT;
-        }
-        result += curr;
     }
+    
+    // 第二步：在处理的字符串中添加连接符
+    string withConnections;
+    for (size_t i = 0; i < processed.size() - 1; ++i) {
+        char curr = processed[i];
+        char next = processed[i + 1];
+        
+        withConnections += curr;
+        
+        // 判断是否需要连接符
+        if (curr != '(' && curr != '|' && 
+            next != '|' && next != ')' && next != '*') {
+            withConnections += CONNECT;
+        }
+    }
+    withConnections += processed.back();  // 添加最后一个字符
+    
+    // 第三步：将占位符恢复为原始转义序列
+    string result;
+    size_t escapeIndex = 0;
+    
+    for (char c : withConnections) {
+        if (c == ESCAPE_PLACEHOLDER) {
+            if (escapeIndex < escapeSequences.size()) {
+                result += escapeSequences[escapeIndex++];
+            }
+        } else {
+            result += c;
+        }
+    }
+    
     return result;
 }
 

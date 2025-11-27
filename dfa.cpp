@@ -417,7 +417,7 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
     out << "        }\n"; // end outer switch
     out << "    }\n"; // end while
 
-    out << "    return -1; // EOF 未匹配\n";
+    out << "    return 0; // EOF 未匹配\n";
     out << "}\n";
 
     out.close();
