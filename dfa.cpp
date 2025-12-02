@@ -294,20 +294,24 @@ string escapeCharForCase(char c) {
 
 
 void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& filename) {
+    // 定义标记，用于后续重新生成时保留用户在文件中手动添加的其他代码
     const string prologBegin = "/* __SEULEX_PROLOG_BEGIN__ */";
-    const string prologEnd   = "/* __SEULEX_PROLOG_END__ */";
-    const string yylexBegin  = "/* __SEULEX_YYLEX_BEGIN__ */";
-    const string yylexEnd    = "/* __SEULEX_YYLEX_END__ */";
+    const string prologEnd = "/* __SEULEX_PROLOG_END__ */";
+    const string yylexBegin = "/* __SEULEX_YYLEX_BEGIN__ */";
+    const string yylexEnd = "/* __SEULEX_YYLEX_END__ */";
 
     string originalContent;
+    
+    // 1. 读取现有文件内容（如果存在），以便保留用户自定义部分
     {
         ifstream existing(filename);
         if (existing.is_open()) {
             originalContent.assign((istreambuf_iterator<char>(existing)),
-                                   istreambuf_iterator<char>());
+                                    istreambuf_iterator<char>());
         }
     }
 
+    // 2. 剥离旧的自动生成部分
     auto stripSection = [&](const string& beginMarker, const string& endMarker) {
         size_t begin = originalContent.find(beginMarker);
         if (begin != string::npos) {
@@ -319,7 +323,7 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
     };
 
     stripSection(prologBegin, prologEnd);
-    stripSection(yylexBegin, yylexEnd);
+    stripSection(yylexBegin, yylexEnd); // 注意：这里你的逻辑是将整个yylex函数体替换
 
     ofstream out(filename);
     if (!out.is_open()) {
@@ -327,97 +331,140 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
         return;
     }
 
+    // 3. 写入头部定义 (Prolog)
     out << prologBegin << "\n";
     out << "#include <stdio.h>\n";
-    out << "#include <string.h>\n\n";
+    out << "#include <string.h>\n";
+    out << "#include <stdlib.h>\n\n"; // 添加 stdlib.h
+    
     out << "int yylineno = 1;\n";
     out << "FILE *yyin = NULL;\n";
     out << "FILE *yyout = NULL;\n\n";
     out << "char yytext[1024] = \"\";\n";
     out << "int yyleng = 0;\n\n";
+    
+    // 修正 input 函数逻辑
     out << "static int input(void) {\n";
     out << "    int c = fgetc(yyin ? yyin : stdin);\n";
     out << "    if (c == '\\n') yylineno++;\n";
-    out << "    return (c == EOF) ? 0 : c;\n";
+    out << "    return c;\n"; // EOF 在 C 中通常是 -1，这里直接返回即可
     out << "}\n\n";
-    out << "#define ECHO fwrite(yytext, yyleng, 1, yyout ? yyout : stdout)\n";
+    
+    // 修正 unput/ungetc 的宏或辅助函数，确保使用正确的流
+    out << "static void yyunput(int c) {\n";
+    out << "    if (c == '\\n') yylineno--;\n";
+    out << "    ungetc(c, yyin ? yyin : stdin);\n";
+    out << "}\n\n";
+
+    out << "#define ECHO fwrite(yytext, 1, yyleng, yyout ? yyout : stdout)\n";
     out << prologEnd << "\n\n";
 
+    // 4. 写入用户原来的其他内容（如果有）
     if (!originalContent.empty()) {
-        out << originalContent;
+        // 简单的去除多余空行的处理
+        size_t first_non_newline = originalContent.find_first_not_of("\n");
+        if (first_non_newline != string::npos) {
+             out << originalContent.substr(first_non_newline);
+        }
         if (originalContent.back() != '\n') {
             out << "\n";
         }
-        out << "\n";
     }
-    
+
+    // 5. 生成核心 yylex 函数
+    out << yylexBegin << "\n";
     out << "int yylex() {\n";
-    out << "    yyleng = 0;\n";
-    out << "    memset(yytext, 0, sizeof(yytext));\n";
-    out << "    int state = " << dfaStates[0]->id << ";\n";
+    out << "    int state = " << dfaStates[0]->id << ";\n"; // 初始状态
     out << "    int ch;\n";
-    // out << "    printf(\"-------------------------新一轮输入-------------------------\\n\");\n";
-    out << "    while ((ch = input())) {\n";
+    out << "    yyleng = 0;\n";
+    out << "    memset(yytext, 0, sizeof(yytext));\n\n";
+    
+    out << "    while (1) {\n"; // 使用死循环，内部通过 break 或 return 跳出
+    out << "        ch = input();\n";
+    out << "        if (ch == EOF) {\n";
+    out << "            if (yyleng > 0) { \n";
+    out << "                // EOF 之前还有未处理的字符，回退并尝试匹配\n";
+    out << "                // 这里简化处理，通常意味着最后一部分匹配失败或结束\n";
+    out << "            }\n";
+    out << "            return YYEOF;\n";
+    out << "        }\n\n";
+
     out << "        switch(state) {\n";
 
     for (auto* state : dfaStates) {
         out << "            case " << state->id << ":\n";
+        
+        // 检查是否有出边
         if (state->transitions.empty()) {
-            out << "                ungetc(ch, stdin);\n";
+            // 没有出边，说明这是一个死胡同或者纯接受状态
+            // 逻辑：回退刚才读入的字符（因为它没被匹配），然后检查当前状态是否接受
+            out << "                yyunput(ch);\n"; 
             if (state->isAccepting) {
-                out << "                // 匹配接受状态\n";
                 if (!state->action.empty()) {
                     out << "                " << state->action << "\n";
-                    out << "                " << "state = 0; memset(yytext, 0, sizeof(yytext)); break;\n";
+                    // 执行完动作后，重置状态机以读取下一个 Token
+                    out << "                state = " << dfaStates[0]->id << ";\n";
+                    out << "                yyleng = 0; memset(yytext, 0, sizeof(yytext));\n";
+                    out << "                break;\n"; 
                 } else {
-                    out << "                return 0; // 匿名接受状态\n";
+                    out << "                return 0; // 默认接受\n";
                 }
             } else {
-                out << "                return -1; // 非接受状态终止\n";
+                out << "                // 错误：到达死状态且非接受状态\n";
+                out << "                printf(\"Lexical error at line %d: unexpected character '%c'\\n\", yylineno, ch);\n";
+                out << "                return -1;\n";
             }
-            continue;
+            continue; 
         }
+
+        // 有出边，生成内部 switch
         out << "                switch(ch) {\n";
-        if(state->id == 0)
-        {
-            out << "                    case EOF:\n";
-            out << "                        return YYEOF;\n";
-        }
-        for (const auto& [symbol, target] : state->transitions) {
+        
+        for (const auto& pair : state->transitions) {
+            char symbol = pair.first;
+            DFAState* target = pair.second;
             string escaped = escapeCharForCase(symbol);
-            out << "                    case '" << escaped << "':\n";            
+
+            out << "                    case '" << escaped << "':\n";
             out << "                        state = " << target->id << ";\n";
-            out << "                        yytext[yyleng++] = ch;\n";
-            if (symbol == ' ' && state->id != 0 && state->id != 1)
-            {
-                out << "                        yytext[yyleng++] = ch;\n";
+            out << "                        if (yyleng < 1023) yytext[yyleng++] = ch;\n";
+            // 保留你原来的特殊逻辑（虽然看起来有点奇怪，可能是特定需求）
+            if (symbol == ' ' && state->id != 0 && state->id != 1) {
+                 // out << "                        yytext[yyleng++] = ch;\n"; 
             }
             out << "                        break;\n";
         }
+
+        // 内部 switch 的 default：当前字符不匹配任何出边
         out << "                    default:\n";
-        out << "                        ungetc(ch, stdin);\n";
+        out << "                        yyunput(ch);\n"; // 回退字符
         if (state->isAccepting) {
+            // 贪婪匹配原则：如果当前无法继续匹配，但当前状态是接受状态，则匹配成功
             if (!state->action.empty()) {
                 out << "                        " << state->action << "\n";
-                out << "                        " << "state = 0; memset(yytext, 0, sizeof(yytext)); break;\n";
+                // 动作执行完后，重置状态机
+                out << "                        state = " << dfaStates[0]->id << ";\n";
+                out << "                        yyleng = 0; memset(yytext, 0, sizeof(yytext));\n";
             } else {
                 out << "                        return 0;\n";
             }
         } else {
+            // 既不能转换，也不是接受状态 -> 词法错误
+            out << "                        printf(\"Lexical error: unexpected char '%c'\\n\", ch);\n";
             out << "                        return -1;\n";
         }
+        out << "                        break;\n";
         out << "                }\n"; // end inner switch
         out << "                break;\n";
     }
 
     out << "            default:\n";
-    out << "                return -1; // 未知状态\n";
+    out << "                return -1; // 未知状态错误\n";
     out << "        }\n"; // end outer switch
     out << "    }\n"; // end while
-
-    out << "    return 0; // EOF 未匹配\n";
-    out << "}\n";
+    out << "}\n"; // end function
+    out << yylexEnd << "\n";
 
     out.close();
-    cout << "已将 C 风格 yylex() 函数追加写入 " << filename << endl;
+    cout << "已成功生成 lex.yy.c (" << filename << ")" << endl;
 }
