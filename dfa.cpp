@@ -368,7 +368,7 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
                 out << "                // 匹配接受状态\n";
                 if (!state->action.empty()) {
                     out << "                " << state->action << "\n";
-                    out << "                " << "state = 0; break;\n";
+                    out << "                " << "state = 0; memset(yytext, 0, sizeof(yytext)); break;\n";
                 } else {
                     out << "                return 0; // 匿名接受状态\n";
                 }
@@ -387,9 +387,7 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
             string escaped = escapeCharForCase(symbol);
             out << "                    case '" << escaped << "':\n";            
             out << "                        state = " << target->id << ";\n";
-            if (symbol != '\n' && symbol != '\t' && symbol != ' ' && symbol != '\f' && symbol != '\r') {
-                out << "                        yytext[yyleng++] = ch;\n";
-            }
+            out << "                        yytext[yyleng++] = ch;\n";
             if (symbol == ' ' && state->id != 0 && state->id != 1)
             {
                 out << "                        yytext[yyleng++] = ch;\n";
@@ -401,7 +399,7 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
         if (state->isAccepting) {
             if (!state->action.empty()) {
                 out << "                        " << state->action << "\n";
-                out << "                        " << "state = 0; break;\n";
+                out << "                        " << "state = 0; memset(yytext, 0, sizeof(yytext)); break;\n";
             } else {
                 out << "                        return 0;\n";
             }
