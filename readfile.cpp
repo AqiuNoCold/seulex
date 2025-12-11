@@ -130,6 +130,7 @@ bool get_file(string s)
 		getline(ifile, onestr);		
 		size_t lbrace_pos = onestr.rfind("{ ");
 		if (lbrace_pos == string::npos) {
+			printf("Debug: onestr='%s'\n", onestr.c_str());
 			cerr << "Missing '{ ' in line: " << lineno << endl;
 			return false;
 		}		
@@ -141,13 +142,13 @@ bool get_file(string s)
 		if (!action.empty() && action.back() == '}') {
 			action.pop_back();
 		}
-		// cout << "orginal: " << re << endl;
+		cout << "orginal: " << re << " action:" << action << endl;
 		re = convertToStandardRE(re);
-		// cout << "infix:";
-		// print_unseen(re);
+		cout << "infix:";
+		print_unseen(re);
 		re = infixToPostfix(re);
-		// cout << "postfix:";
-		// print_unseen(re);
+		cout << "postfix:";
+		print_unseen(re);
 		NFA nfa = postfixToNFA(re);
         NFAtable.push_back(nfa);
 		acceptActions.insert({nfa.end->id, action});

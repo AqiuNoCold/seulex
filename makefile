@@ -32,6 +32,10 @@ run: $(TARGET)
 	@echo "Usage: make run FILE=xxx.l"
 	@./$(TARGET) $(FILE)
 
+minic: FILE = minic.l
+minic: run
+
+
 # debug 目标：附加调试标志，先清理再构建
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: clean all

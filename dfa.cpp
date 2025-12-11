@@ -1,4 +1,4 @@
-#include <iostream>
+#include <!ostream>
 #include <queue>
 #include <stack>
 #include <unordered_map>
@@ -343,7 +343,6 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
     out << "char yytext[1024] = \"\";\n";
     out << "int yyleng = 0;\n\n";
     
-    // 修正 input 函数逻辑
     out << "static int input(void) {\n";
     out << "    int c = fgetc(yyin ? yyin : stdin);\n";
     out << "    if (c == '\\n') yylineno++;\n";
@@ -381,11 +380,8 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
     
     out << "    while (1) {\n"; // 使用死循环，内部通过 break 或 return 跳出
     out << "        ch = input();\n";
-    out << "        if (ch == EOF) {\n";
-    out << "            if (yyleng > 0) { \n";
-    out << "                // EOF 之前还有未处理的字符，回退并尝试匹配\n";
-    out << "                // 这里简化处理，通常意味着最后一部分匹配失败或结束\n";
-    out << "            }\n";
+    out << "        printf(\"Read char: '%c' (ASCII %d) in state %d\\n\", ch, ch, state);\n\n";
+    out << "        if (ch == EOF && yyleng == 0) {\n";
     out << "            return YYEOF;\n";
     out << "        }\n\n";
 
@@ -402,13 +398,11 @@ void generateYylexFromDFA(const vector<DFAState*>& dfaStates, const string& file
             if (state->isAccepting) {
                 if (!state->action.empty()) {
                     out << "                " << state->action << "\n";
-                    // 执行完动作后，重置状态机以读取下一个 Token
-                    out << "                state = " << dfaStates[0]->id << ";\n";
-                    out << "                yyleng = 0; memset(yytext, 0, sizeof(yytext));\n";
-                    out << "                break;\n"; 
-                } else {
-                    out << "                return 0; // 默认接受\n";
                 }
+                // 执行完动作后，重置状态机以读取下一个 Token
+                out << "                state = " << dfaStates[0]->id << ";\n";
+                out << "                yyleng = 0; memset(yytext, 0, sizeof(yytext));\n";
+                out << "                break;\n"; 
             } else {
                 out << "                // 错误：到达死状态且非接受状态\n";
                 out << "                printf(\"Lexical error at line %d: unexpected character '%c'\\n\", yylineno, ch);\n";
